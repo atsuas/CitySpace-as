@@ -4,21 +4,47 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    private GameObject player;  //プレイヤー情報格納用
-    private Vector3 offset; // 相対距離取得用
+    [SerializeField]
+    private Transform m_target = null;
+    [SerializeField]
+    private float m_speed = 0.0f;
 
-    void Start()
+    public Transform Target
     {
-        //　Playerの情報を取得
-        this.player = GameObject.Find("Player");
-
-        // メインカメラ（自分自身）とPlayerとの相対距離を求める
-        offset = transform.position - player.transform.position;
+        get { return m_target; }
     }
 
-    void Update()
+    private Transform m_cameraTransform = null;
+    private Transform m_pivot = null;
+
+    private void Awake()
     {
-        //　新しいトランスフォームの値を代入する
-        transform.position = player.transform.position + offset;
+        Camera camera = GetComponentInChildren<Camera>();
+        Debug.AssertFormat(camera != null, "カメラが無ぇよ!");
+        if (camera == null)
+        {
+            return;
+        }
+
+        m_cameraTransform = camera.transform;
+        m_pivot = m_cameraTransform.parent;
+    }
+
+    private void LateUpdate()
+    {
+        UpdateCamera();
+    }
+
+    private void UpdateCamera()
+    {
+        if (Target == null)
+        {
+            return;
+        }
+
+        Vector3 targetPos = Target.position;
+
+        float deltaSpeed = m_speed * Time.deltaTime;
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, deltaSpeed);
     }
 }

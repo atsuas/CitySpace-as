@@ -6,6 +6,8 @@ public class PlayerController : MonoBehaviour
 {
     float x;
     float z;
+    float inputHorizontal;
+    float inputVertical;
     public float moveSpeed = 2;
 
     Rigidbody rb;
