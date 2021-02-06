@@ -4,47 +4,62 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField]
-    private Transform m_target = null;
-    [SerializeField]
-    private float m_speed = 0.0f;
+    public GameObject playerObject;
+    public Vector2 rotationSpeed;
+    public bool reverse;
 
-    public Transform Target
+    private Camera mainCamera;
+    private Vector2 lastMousePosition;
+
+    void Start()
     {
-        get { return m_target; }
+        mainCamera = Camera.main;
     }
 
-    private Transform m_cameraTransform = null;
-    private Transform m_pivot = null;
-
-    private void Awake()
+    void Update()
     {
-        Camera camera = GetComponentInChildren<Camera>();
-        Debug.AssertFormat(camera != null, "カメラが無ぇよ!");
-        if (camera == null)
+        if (Input.GetMouseButtonDown(0))
         {
-            return;
+            lastMousePosition = Input.mousePosition;
         }
-
-        m_cameraTransform = camera.transform;
-        m_pivot = m_cameraTransform.parent;
-    }
-
-    private void LateUpdate()
-    {
-        UpdateCamera();
-    }
-
-    private void UpdateCamera()
-    {
-        if (Target == null)
+        else if (Input.GetMouseButton(0))
         {
-            return;
+            if (!reverse)
+            {
+                var x = (lastMousePosition.x - Input.mousePosition.x);
+                var y = (Input.mousePosition.y - lastMousePosition.y);
+
+                if (Mathf.Abs(x) < Mathf.Abs(y))
+                    x = 0;
+                else
+                    y = 0;
+
+                var newAngle = Vector3.zero;
+                newAngle.x = x * rotationSpeed.x;
+                newAngle.y = y * rotationSpeed.y;
+
+                mainCamera.transform.RotateAround(playerObject.transform.position, Vector3.up, newAngle.x);
+                mainCamera.transform.RotateAround(playerObject.transform.position, transform.right, newAngle.y);
+                lastMousePosition = Input.mousePosition;
+            }
+            else
+            {
+                var x = (Input.mousePosition.x - lastMousePosition.x);
+                var y = (lastMousePosition.y - Input.mousePosition.y);
+
+                if (Mathf.Abs(x) < Mathf.Abs(y))
+                    x = 0;
+                else
+                    y = 0;
+
+                var newAngle = Vector3.zero;
+                newAngle.x = x * rotationSpeed.x;
+                newAngle.y = y * rotationSpeed.y;
+
+                mainCamera.transform.RotateAround(playerObject.transform.position, Vector3.up, newAngle.x);
+                mainCamera.transform.RotateAround(playerObject.transform.position, transform.right, newAngle.y);
+                lastMousePosition = Input.mousePosition;
+            }
         }
-
-        Vector3 targetPos = Target.position;
-
-        float deltaSpeed = m_speed * Time.deltaTime;
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, deltaSpeed);
     }
 }
