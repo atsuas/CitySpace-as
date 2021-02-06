@@ -9,18 +9,14 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed = 2;
 
     Rigidbody rb;
-    //アニメーターを設定
     Animator animator;
 
-    // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        //アニメーターを取得
         animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         x = Input.GetAxisRaw("Horizontal");
@@ -29,8 +25,11 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        // 方向を取得
+        Vector3 direction = transform.position + new Vector3(x, 0, z) * moveSpeed;
+        // directionの方向に向く
+        transform.LookAt(direction);
         rb.velocity = new Vector3(x, 0, z) * moveSpeed;
-        //パラメータを取得
         animator.SetFloat("Speed", rb.velocity.magnitude);
     }
 }
